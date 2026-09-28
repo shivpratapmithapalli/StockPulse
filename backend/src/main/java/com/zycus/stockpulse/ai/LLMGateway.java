@@ -25,13 +25,22 @@ public class LLMGateway {
     private final RestTemplate restTemplate = new RestTemplate();
     
     public String callLLM(String prompt) {
-        return switch (provider.toLowerCase()) {
-            case "gemini" -> callGemini(prompt);
-            case "groq" -> callOpenAICompatible(prompt, baseUrl + "/openai/v1/chat/completions");
-            case "ollama" -> callOpenAICompatible(prompt, baseUrl + "/v1/chat/completions");
-            case "qwen-cursor" -> callQwenCursor(prompt);
-            default -> throw new IllegalStateException("Unknown provider: " + provider);
-        };
+        try {
+            return switch (provider.toLowerCase()) {
+                case "gemini" -> callGemini(prompt);
+                case "groq" -> callOpenAICompatible(prompt, baseUrl + "/openai/v1/chat/completions");
+                case "ollama" -> callOpenAICompatible(prompt, baseUrl + "/v1/chat/completions");
+                case "qwen-cursor" -> callQwenCursor(prompt);
+                default -> {
+                    System.err.println("Unknown provider: " + provider);
+                    yield "{\"error\": \"Unknown provider: " + provider + "\"}";
+                }
+            };
+        } catch (Exception e) {
+            System.err.println("Error in callLLM: " + e.getMessage());
+            e.printStackTrace();
+            return "{\"error\": \"Failed to call LLM: " + e.getMessage() + "\"}";
+        }
     }
     
     private String callGemini(String prompt) {
@@ -57,7 +66,11 @@ public class LLMGateway {
                 
             return response.getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to call Gemini API", e);
+            // Log the error but don't throw an exception that could break the application
+            System.err.println("Failed to call Gemini API: " + e.getMessage());
+            e.printStackTrace();
+            // Return a fallback response or empty string
+            return "{\"error\": \"Failed to call Gemini API\"}";
         }
     }
     
@@ -81,7 +94,11 @@ public class LLMGateway {
                 
             return response.getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to call OpenAI-compatible API", e);
+            // Log the error but don't throw an exception that could break the application
+            System.err.println("Failed to call OpenAI-compatible API: " + e.getMessage());
+            e.printStackTrace();
+            // Return a fallback response or empty string
+            return "{\"error\": \"Failed to call OpenAI-compatible API\"}";
         }
     }
     
@@ -108,7 +125,11 @@ public class LLMGateway {
                 
             return response.getBody();
         } catch (Exception e) {
-            throw new RuntimeException("Failed to call Qwen-Cursor API", e);
+            // Log the error but don't throw an exception that could break the application
+            System.err.println("Failed to call Qwen-Cursor API: " + e.getMessage());
+            e.printStackTrace();
+            // Return a fallback response or empty string
+            return "{\"error\": \"Failed to call Qwen-Cursor API\"}";
         }
     }
 }
