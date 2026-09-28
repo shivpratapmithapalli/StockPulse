@@ -20,34 +20,76 @@ export const OrderSimModal: React.FC<OrderSimModalProps> = ({
   onPlaceSimulatedOrder,
   onNavigateToFloor,
 }) => {
-  const [targetProductId, setTargetProductId] = useState<string>('PRD-003');
+  const [targetProductId, setTargetProductId] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(2);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [orderPlacedSuccess, setOrderPlacedSuccess] = useState<boolean>(false);
 
-  // oxlint-disable-next-line react/set-state-in-effect -- initializing modal state from props when modal opens
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- initializing modal state from props when modal opens
   useEffect(() => {
-    if (selectedProduct) {
-      setTargetProductId(selectedProduct.id);
-    } else {
-      // Default to PRD-003 if available, or first product
-      const hasPrd003 = products.some((p) => p.id === 'PRD-003');
-      if (hasPrd003) {
-        setTargetProductId('PRD-003');
+    if (isOpen) {
+      if (selectedProduct) {
+        setTargetProductId(selectedProduct.id);
       } else if (products.length > 0) {
-        setTargetProductId(products[0].id);
+        // Default to PRD-003 if available, or first product
+        const defaultProduct = products.find(p => p.id === 'PRD-003') ?? products[0];
+        if (defaultProduct) {
+          setTargetProductId(defaultProduct.id);
+        }
       }
+      setOrderPlacedSuccess(false);
+      // Reset quantity when modal opens
+      setQuantity(2);
     }
-    setOrderPlacedSuccess(false);
-  }, [selectedProduct, products, isOpen]);
+  }, [isOpen, selectedProduct, products]);
 
   if (!isOpen) return null;
 
-  const currentProduct = products.find((p) => p.id === targetProductId) || products[0];
+  // Handle case where there are no products
+  if (products.length === 0) {
+    return (
+      <div className="modal-overlay animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="sim-modal-title">
+        <div className="modal-card">
+          <div className="modal-header">
+            <div className="modal-title-box">
+              <h3 id="sim-modal-title" className="modal-title">
+                Simulate Customer Sales Order
+              </h3>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="modal-close-btn"
+              aria-label="Close modal"
+            >
+              <X size={18} />
+            </button>
+          </div>
+          <div className="modal-body-empty">
+            <p>No products available for simulation.</p>
+            <div className="modal-footer-actions">
+              <Button
+                variant="ghost"
+                onClick={onClose}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const currentProduct = products.find((p) => p.id === targetProductId) || 
+                     products.find(p => p.id === 'PRD-003') || 
+                     products[0] || 
+                     null;
+                     
   const currentStock = currentProduct ? currentProduct.stockLevel : 0;
   const threshold = currentProduct ? currentProduct.reorderThreshold : 0;
   const simulatedStock = Math.max(0, currentStock - quantity);
-  const willTriggerLowStock = simulatedStock < threshold;
+  const willTriggerLowStock = currentProduct && simulatedStock < threshold;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +99,8 @@ export const OrderSimModal: React.FC<OrderSimModalProps> = ({
     try {
       await onPlaceSimulatedOrder(currentProduct.id, quantity);
       setOrderPlacedSuccess(true);
+      // Close the modal immediately
+      onClose();
     } catch {
       // Handled via toast in parent
     } finally {
@@ -72,7 +116,6 @@ export const OrderSimModal: React.FC<OrderSimModalProps> = ({
         {/* Modal Header */}
         <div className="modal-header">
           <div className="modal-title-box">
-            <span className="modal-kicker mono">Agentic Commerce Sandbox</span>
             <h3 id="sim-modal-title" className="modal-title">
               Simulate Customer Sales Order
             </h3>
@@ -111,13 +154,19 @@ export const OrderSimModal: React.FC<OrderSimModalProps> = ({
                 }}
                 icon={<Sparkles size={14} />}
               >
-                Go to Review Floor
+                Go to Review Pane
               </Button>
               <Button
                 variant="ghost"
                 onClick={() => setOrderPlacedSuccess(false)}
               >
                 Simulate Another
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={onClose}
+              >
+                Close
               </Button>
             </div>
           </div>
@@ -141,7 +190,7 @@ export const OrderSimModal: React.FC<OrderSimModalProps> = ({
               >
                 {products.map((p) => (
                   <option key={p.id} value={p.id}>
-                    {p.sku} — {p.name} (Stock: {p.stockLevel}, Thr: {p.reorderThreshold})
+                    {p.name} (SKU: {p.sku}) - ${p.currentPrice.toFixed(2)} - Stock: {p.stockLevel}
                   </option>
                 ))}
               </select>
@@ -159,7 +208,12 @@ export const OrderSimModal: React.FC<OrderSimModalProps> = ({
                   min="1"
                   max={Math.max(1, currentStock)}
                   value={quantity}
-                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value, 10) || 1))}
+                  onChange={(e) => {
+                    const value = parseInt(e.target.value, 10);
+                    if (!isNaN(value) && value > 0) {
+                      setQuantity(Math.min(value, Math.max(1, currentStock)));
+                    }
+                  }}
                   className="form-input mono"
                   disabled={isSubmitting}
                 />
@@ -184,12 +238,12 @@ export const OrderSimModal: React.FC<OrderSimModalProps> = ({
                 <div className="sim-preview-title mono">Projected State Change:</div>
                 <div className="sim-preview-nodes">
                   <div className="sim-node">
-                    <span className="node-label mono">Current Stock</span>
+                    <span className="node-label mono">Current Stock:</span>
                     <span className="node-val mono">{currentStock} units</span>
                   </div>
                   <ArrowRight size={16} className="text-ink3" />
                   <div className="sim-node">
-                    <span className="node-label mono">Post-Order Stock</span>
+                    <span className="node-label mono">Post-Order Stock:</span>
                     <span className={`node-val mono font-bold ${willTriggerLowStock ? 'text-amber' : ''}`}>
                       {simulatedStock} units
                     </span>

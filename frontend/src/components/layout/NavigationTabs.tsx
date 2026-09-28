@@ -1,7 +1,7 @@
 import React from 'react';
-import { Eye, Layers, GitCommit } from 'lucide-react';
+import { Eye, Layers } from 'lucide-react';
 
-export type ActiveTab = 'FLOOR' | 'CEILING' | 'TRACE';
+export type ActiveTab = 'FLOOR' | 'CEILING';
 
 interface NavigationTabsProps {
   activeTab: ActiveTab;
@@ -19,7 +19,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
   return (
     <nav className="nav-tabs-wrapper" aria-label="Console Navigation">
       <div className="nav-tabs-bar">
-        {/* Tab 1: The Floor */}
+        {/* Tab 1: Review Pane */}
         <button
           type="button"
           onClick={() => onChangeTab('FLOOR')}
@@ -28,7 +28,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
           role="tab"
         >
           <Eye size={15} />
-          <span>The Floor · Merchandising Review</span>
+          <span>Review Pane</span>
           {pendingCount > 0 ? (
             <span className="nav-tab-count badge-accent mono">{pendingCount}</span>
           ) : (
@@ -36,7 +36,7 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
           )}
         </button>
 
-        {/* Tab 2: The Ceiling */}
+        {/* Tab 2: Product Catalog */}
         <button
           type="button"
           onClick={() => onChangeTab('CEILING')}
@@ -45,20 +45,8 @@ export const NavigationTabs: React.FC<NavigationTabsProps> = ({
           role="tab"
         >
           <Layers size={15} />
-          <span>The Ceiling · Product Catalog</span>
+          <span>Product Catalog</span>
           <span className="nav-tab-count badge-gray mono">{catalogCount}</span>
-        </button>
-
-        {/* Tab 3: Agentic Loop Trace */}
-        <button
-          type="button"
-          onClick={() => onChangeTab('TRACE')}
-          className={`nav-tab-item mono ${activeTab === 'TRACE' ? 'active' : ''}`}
-          aria-selected={activeTab === 'TRACE'}
-          role="tab"
-        >
-          <GitCommit size={15} />
-          <span>Agentic Loop Architecture</span>
         </button>
       </div>
     </nav>

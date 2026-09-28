@@ -41,7 +41,7 @@
 }
 
 .masthead-title {
-  font-size: clamp(28px, 4.5vw, 48px);
+  font-size: clamp(20px, 3.5vw, 36px);
   font-weight: 800;
   line-height: 1.05;
   letter-spacing: -0.025em;
@@ -724,7 +724,7 @@
 }
 
 .price-node-val {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .strike {
@@ -1089,7 +1089,7 @@
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: var(--shadow-lg);
-  padding: 28px;
+  padding: 24px;
 }
 
 .modal-header {
@@ -1111,7 +1111,7 @@
 }
 
 .modal-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--ink);
 }
@@ -1220,6 +1220,17 @@
 
 .sim-node {
   text-align: center;
+}
+
+.node-label {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.node-val {
+  font-size: 16px;
 }
 
 .sim-warning-callout {

@@ -262,7 +262,7 @@ function MerchandisingConsole() {
           <section className="catalog-section" aria-label="Product Catalog Floor">
             <div className="section-rule">
               <span className="section-rule-label mono">
-                The Ceiling · Master Inventory Grid ({products.length} Items)
+                Product Catalog ({products.length} Items)
               </span>
               <div className="section-rule-line" />
             </div>
@@ -283,14 +283,6 @@ function MerchandisingConsole() {
               quickSaleLoadingId={quickSaleLoadingId}
             />
           </section>
-        )}
-
-        {activeTab === 'TRACE' && (
-          <AgenticLoopView
-            activeStrategy={activeStrategy}
-            pendingCount={pendingItems.length}
-            totalProducts={products.length}
-          />
         )}
       </main>
 

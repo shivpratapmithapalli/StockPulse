@@ -40,40 +40,9 @@ export const PendingReviewPanel: React.FC<PendingReviewPanelProps> = ({
       {/* Section Header */}
       <div className="section-rule">
         <span className="section-rule-label mono">
-          Human-in-the-Loop Floor · {pendingItems.length} Active {pendingItems.length === 1 ? 'Check' : 'Checks'}
+          Review Pane · {pendingItems.length} Active {pendingItems.length === 1 ? 'Check' : 'Checks'}
         </span>
         <div className="section-rule-line" />
-      </div>
-
-      {/* Demo Walkthrough Helper Banner */}
-      <div className="demo-helper-banner">
-        <div className="banner-left">
-          <div className="banner-badge mono">
-            <Sparkles size={12} />
-            <span>Interactive Zero-Curl Demo</span>
-          </div>
-          <p className="banner-text">
-            Evaluate the agentic loop in real time: Decrement stock below threshold or spike demand to see automated recommendations surface here in 2–3 seconds.
-          </p>
-        </div>
-        <div className="banner-actions">
-          <Button
-            variant="primary"
-            size="sm"
-            loading={isQuickSimulating}
-            onClick={onQuickSimulatePrd003}
-            icon={<ShoppingCart size={13} />}
-          >
-            Simulate 2x Sale on PRD-003
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onOpenSimModal}
-          >
-            Custom Simulation...
-          </Button>
-        </div>
       </div>
 
       {/* Loading Skeleton / Initial Loading State */}

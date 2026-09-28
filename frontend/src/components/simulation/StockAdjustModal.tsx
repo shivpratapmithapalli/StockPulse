@@ -19,7 +19,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
   const [stockLevel, setStockLevel] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // oxlint-disable-next-line react/set-state-in-effect -- initializing modal state from props when modal opens
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- initializing modal state from props when modal opens
   useEffect(() => {
     if (product) {
       setStockLevel(product.stockLevel);
@@ -30,7 +30,8 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (stockLevel < 0) return;
+    // Prevent submission if value hasn't changed or is invalid
+    if (stockLevel < 0 || stockLevel === product.stockLevel) return;
 
     setIsSubmitting(true);
     try {
@@ -49,7 +50,6 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
         {/* Modal Header */}
         <div className="modal-header">
           <div className="modal-title-box">
-            <span className="modal-kicker mono">Inventory Override</span>
             <h3 id="adjust-modal-title" className="modal-title">
               Adjust Stock Level
             </h3>
@@ -96,12 +96,12 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
             <div className="sim-preview-title mono">Stock Change:</div>
             <div className="sim-preview-nodes">
               <div className="sim-node">
-                <span className="node-label mono">From</span>
+                <span className="node-label mono">From:</span>
                 <span className="node-val mono">{product.stockLevel} units</span>
               </div>
               <ArrowRight size={16} className="text-ink3" />
               <div className="sim-node">
-                <span className="node-label mono">To</span>
+                <span className="node-label mono">To:</span>
                 <span className="node-val mono font-bold text-accent">
                   {stockLevel} units
                 </span>
@@ -119,6 +119,7 @@ export const StockAdjustModal: React.FC<StockAdjustModalProps> = ({
               type="submit"
               variant="primary"
               loading={isSubmitting}
+              disabled={isSubmitting || stockLevel === product.stockLevel}
               icon={<Edit3 size={14} />}
             >
               Update Stock Level

@@ -42,13 +42,8 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="masthead">
         {/* Left: Branding & Editorial Headings */}
         <div className="masthead-brand">
-          <div className="masthead-kicker mono">
-            <span className="kicker-tag">StockPulse</span>
-            <span className="kicker-sep">/</span>
-            <span>Enterprise Merchandising Console</span>
-          </div>
           <h1 className="masthead-title">
-            <em>AI</em> Inventory &amp; Dynamic Pricing
+            StockPulse
           </h1>
           <p className="masthead-tagline sans">
             Autonomous commerce signals paired with human-in-the-loop oversight.
